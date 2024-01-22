@@ -1,0 +1,427 @@
+
+\ProvidesPackage{rishabh}
+
+% Packages
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{thmtools}
+\RequirePackage{ifthen}
+\RequirePackage{xparse}
+\RequirePackage{mathtools}
+\RequirePackage[shortlabels]{enumitem}
+\RequirePackage{iftex}
+\RequirePackage{nomencl}
+% https://cs.brown.edu/about/system/managed/latex/doc/nomencl.pdf
+
+% Options
+\newif\ifrishabhframe\rishabhframefalse
+\newif\ifrishabhsec\rishabhsecfalse
+\DeclareOption{frame}{\rishabhframetrue}
+\DeclareOption{sec}{\rishabhsectrue}
+
+\ProcessOptions\relax
+
+%Numbers Macros
+\newcommand{\scin}[1]{ \cdot 10^{#1} }
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\dang}{\measuredangle} %% Directed angle
+\newcommand{\ray}[1]{\overrightarrow{#1}}
+\newcommand{\seg}[1]{\overline{#1}}
+\newcommand{\ii}{\item}
+\newcommand{\mailto}[1]{\href{mailto:#1}{\texttt{#1}}}
+
+%Attributes
+\newcommand{\ol}{\overline}
+\newcommand{\ul}{\underline}
+\newcommand{\wt}{\widetilde}
+\newcommand{\wh}{\widehat}
+\newcommand{\inv}{^{-1}}
+\newcommand{\dg}{^\circ}
+
+%Math Symbols
+\newcommand{\CC}{\mathbb C}
+\newcommand{\FF}{\mathbb F}
+\newcommand{\NN}{\mathbb N}
+\newcommand{\QQ}{\mathbb Q}
+\newcommand{\RR}{\mathbb R}
+\newcommand{\ZZ}{\mathbb Z}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\II}{i \mathbb R}
+
+\newcommand{\SA}{\mathcal A}
+\newcommand{\SB}{\mathcal B}
+\newcommand{\SC}{\mathcal C}
+\newcommand{\SF}{\mathcal F}
+\newcommand{\SG}{\mathcal G}
+\newcommand{\SH}{\mathcal H}
+\newcommand{\OO}{\mathcal O}
+
+\newcommand{\SCA}{\mathscr A}
+\newcommand{\SCB}{\mathscr B}
+\newcommand{\SCC}{\mathscr C}
+\newcommand{\SCD}{\mathscr D}
+\newcommand{\SCE}{\mathscr E}
+\newcommand{\SCF}{\mathscr F}
+\newcommand{\SCG}{\mathscr G}
+\newcommand{\SCH}{\mathscr H}
+
+\newcommand{\w}{\omega}
+
+%Math Operators
+\DeclareMathOperator{\cis}{cis}
+\DeclareMathOperator*{\lcm}{lcm}
+\DeclareMathOperator*{\argmin}{arg min}
+\DeclareMathOperator*{\argmax}{arg max}
+\newcommand{\cycsum}{\sum_{\mathrm{cyc}}}
+\newcommand{\symsum}{\sum_{\mathrm{sym}}}
+\newcommand{\cycprod}{\prod_{\mathrm{cyc}}}
+\newcommand{\symprod}{\prod_{\mathrm{sym}}}
+
+%Set Notation
+\RequirePackage{mathabx}
+\newcommand{\disj}{\wedge}
+\newcommand{\conj}{\vee}
+
+% Headers
+\RequirePackage[headsepline]{scrlayer-scrpage}
+\RequirePackage{titling}
+\renewcommand{\headfont}{}
+\addtolength{\textheight}{3.14cm}
+\setlength{\footskip}{0.5in}
+\setlength{\headsep}{10pt}
+\ihead{\footnotesize\textbf{\theauthor} --- \thedate}
+\automark{section}
+\chead{}
+\ohead{\footnotesize\textbf{\thetitle}}
+\cfoot{\pagemark}
+
+\makeatletter
+	\renewcommand*{\@seccntformat}[1]{%
+	\S \csname the#1\endcsname \ }
+\makeatother
+
+% Preventing Header Conflicts with FancyHdr Package
+\RequirePackage{savesym}
+\savesymbol{chead}
+\savesymbol{cfoot}
+
+% Simple Parenthesis
+% https://tex.stackexchange.com/questions/45946/stack-datastructure-using-latex
+\makeatletter
+\newcommand\newstack[1]{\let#1\@empty}
+\newcommand{\addQelement}[2]{\gdef\element{#2}\pushQelement{#1}}
+\newcommand{\pushQelement}[1]{\xdef#1{\element+#1}}
+\long\def\popQ#1+#2\@nil#3{\gdef\poppedQelement{#1}\gdef#3{#2}}
+\long\def\peekQ#1+#2\@nil#3{\gdef\poppedQelement{#1}}
+\newcommand\popQelement[1]{\ifx #1\@empty  Error\else\expandafter\popQ#1\@nil#1\fi}
+\newcommand\peekQelement[1]{\ifx #1\@empty  Error\else\expandafter\peekQ#1\@nil#1\fi}
+\makeatother
+
+\makeatletter
+% for amsmath "compatibility" (not sophisticated)
+\AtBeginDocument {%
+          \def\resetMathstrut@{%
+           \setbox\z@\hbox{\the\textfont\symoperators\char40}%
+           \ht\Mathstrutbox@\ht\z@ \dp\Mathstrutbox@\dp\z@}%
+}%
+\makeatother
+
+\newcommand*\autooS{\peekQelement{\bracketstack}\ifthenelse{\equal{\poppedQelement}{S}}{\right\originalbardelimiterS\popQelement{\bracketstack}}{\left\originalbardelimiterS\addQelement{\bracketstack}{S}}}
+\newcommand*\autoop{\left(\addQelement{\bracketstack}{p}}
+\newcommand*\autocp{\right)\popQelement{\bracketstack}}
+\newcommand*\autoob{\left[\addQelement{\bracketstack}{b}}
+\newcommand*\autocb{\right]\popQelement{\bracketstack}}
+\DeclareRobustCommand*\{{\ifmmode \left\lbrace\addQelement{\bracketstack}{c} \else \textbraceleft \fi }
+\DeclareRobustCommand*\}{\ifmmode \right\rbrace\popQelement{\bracketstack} \else \textbraceright \fi }
+
+\newstack{\bracketstack}
+\addQelement{\bracketstack}{START}
+\newif\ifinsidebracedgroup
+\AtBeginDocument {%
+   \let\originalbardelimiter\|
+   \let\originalbardelimiterS|
+   \def\mysbar{\peekQelement{\bracketstack}\ifthenelse{\equal{\poppedQelement}{s}}{\right\originalbardelimiter\popQelement{\bracketstack}}{\left\originalbardelimiter\addQelement{\bracketstack}{s}}}%
+   \let\|\mysbar
+   \mathcode`( 32768
+   \mathcode`) 32768
+   \mathcode`[ 32768
+   \mathcode`] 32768
+   \mathcode`| 32768
+
+   \begingroup
+       \lccode`\~`(
+       \lowercase{%
+   \endgroup
+       \let~\autoop
+   }\begingroup
+       \lccode`\~`)
+       \lowercase{%
+   \endgroup
+       \let~\autocp
+   }\begingroup
+       \lccode`\~`[
+       \lowercase{%
+   \endgroup
+       \let~\autoob
+   }\begingroup
+       \lccode`\~`]
+       \lowercase{%
+   \endgroup
+       \let~\autocb
+   }\begingroup
+       \lccode`\~`|
+       \lowercase{%
+   \endgroup
+       \let~\autooS
+   }}
+
+\delimiterfactor 1001
+
+% Frames
+    % \RequirePackage{fancyhdr}
+    \RequirePackage{xpatch}
+    \RequirePackage[usenames,svgnames,dvipsnames,table]{xcolor}
+    \RequirePackage[framemethod=TikZ]{mdframed}
+    \usetikzlibrary{shadows}
+    % https://tex.stackexchange.com/a/292090/76888
+    % https://github.com/marcodaniel/mdframed/issues/12
+    
+    \makeatletter
+    \xpatchcmd{\endmdframed}
+    {\aftergroup\endmdf@trivlist\color@endgroup}
+    {\endmdf@trivlist\color@endgroup\@doendpe}
+    {}{}
+    \makeatother
+
+    \mdfdefinestyle{mdbluebox}{%
+      roundcorner=10pt,
+      linewidth=1pt,
+      skipabove=12pt,
+      innerbottommargin=9pt,
+      skipbelow=2pt,
+      linecolor=blue,
+      nobreak=true,
+      backgroundcolor=TealBlue!5,
+    }
+    \declaretheoremstyle[
+      headfont=\sffamily\bfseries\color{MidnightBlue},
+      mdframed={style=mdbluebox},
+      headpunct={\\[3pt]},
+      postheadspace={0pt}
+    ]{thmbluebox}
+
+    \mdfdefinestyle{mdredbox}{%
+      linewidth=0.5pt,
+      skipabove=12pt,
+      frametitleaboveskip=5pt,
+      frametitlebelowskip=0pt,
+      skipbelow=2pt,
+      frametitlefont=\bfseries,
+      innertopmargin=4pt,
+      innerbottommargin=8pt,
+      nobreak=true,
+      backgroundcolor=Salmon!5,
+      linecolor=RawSienna,
+    }
+    \declaretheoremstyle[
+      headfont=\bfseries\color{RawSienna},
+      mdframed={style=mdredbox},
+      headpunct={\\[3pt]},
+      postheadspace={0pt},
+    ]{thmredbox}
+
+    \mdfdefinestyle{mdgreenbox}{%
+      skipabove=8pt,
+      skipbelow=0pt,
+      linewidth=2pt,
+      rightline=false,
+      leftline=true,
+      topline=false,
+      bottomline=false,
+      linecolor=ForestGreen,
+      backgroundcolor=ForestGreen!5,
+    }
+    \declaretheoremstyle[
+      headfont=\bfseries\sffamily\color{ForestGreen!70!black},
+      bodyfont=\normalfont,
+      spaceabove=2pt,
+      spacebelow=1pt,
+      mdframed={style=mdgreenbox},
+      headpunct={ --- },
+    ]{thmgreenbox}
+
+    \mdfdefinestyle{mdblackbox}{%
+      skipabove=8pt,
+      linewidth=3pt,
+      rightline=false,
+      leftline=true,
+      topline=false,
+      bottomline=false,
+      linecolor=black,
+      backgroundcolor=RedViolet!5!gray!5,
+    }
+    \declaretheoremstyle[
+      headfont=\bfseries,
+      bodyfont=\normalfont\small,
+      spaceabove=0pt,
+      spacebelow=0pt,
+      mdframed={style=mdblackbox}
+    ]{thmblackbox}
+
+    \mdfdefinestyle{mdpurplebox}{%
+      roundcorner=10pt,
+      linewidth=1pt,
+      skipabove=12pt,
+      skipbelow=12pt,
+      innertopmargin=9pt,
+      innerbottommargin=9pt,
+      linecolor=black,
+      nobreak=true,
+      backgroundcolor=Orchid!10,
+      shadow=true,
+      shadowsize=6pt,
+      shadowcolor=black!30,
+      frametitleaboveskip=8pt,
+      frametitlebelowskip=8pt,
+      frametitlebackgroundcolor=Violet!50!black,
+      frametitlefont=\bfseries\sffamily\color{white},
+      frametitlerule=true,
+    }
+    \newcommand{\listhack}{$\empty$\vspace{-2em}}
+    
+%Framed Enviornments
+\ifrishabhframe
+     \theoremstyle{definition}
+     \ifrishabhsec
+		\declaretheorem[style=thmbluebox,name=Theorem,numberwithin=section]{theorem}
+     \else
+		\declaretheorem[style=thmbluebox,name=Theorem]{theorem}
+     \fi
+
+     \declaretheorem[style=thmbluebox,name=Lemma,sibling=theorem]{lemma}
+     \declaretheorem[style=thmbluebox,name=Proposition,sibling=theorem]{proposition}
+     \declaretheorem[style=thmbluebox,name=Corollary,sibling=theorem]{corollary}
+     \declaretheorem[style=thmbluebox,name=Assumption,sibling=theorem]{assume}
+     \declaretheorem[style=thmbluebox,name=Theorem,numbered=no]{theorem*}
+     \declaretheorem[style=thmbluebox,name=Lemma,numbered=no]{lemma*}
+     \declaretheorem[style=thmbluebox,name=Proposition,numbered=no]{proposition*}
+     \declaretheorem[style=thmbluebox,name=Corollary,numbered=no]{corollary*}
+     \declaretheorem[style=thmbluebox,name=Assumption,numbered=no]{assume*}
+     
+     \declaretheorem[style=thmgreenbox,name=Algorithm,sibling=theorem]{algorithm}
+     \declaretheorem[style=thmgreenbox,name=Algorithm,numbered=no]{algorithm*}
+     \declaretheorem[style=thmgreenbox,name=Claim,sibling=theorem]{claim}
+     \declaretheorem[style=thmgreenbox,name=Claim,numbered=no]{claim*}
+
+     \declaretheorem[style=thmredbox,name=Example,sibling=theorem]{example}
+     \declaretheorem[style=thmredbox,name=Example,numbered=no]{example*}
+     \declaretheorem[style=thmredbox,name=Problem]{problem}
+     \declaretheorem[style=thmredbox,name=Problem,numbered=no]{problem*}
+
+% Standard Environemnts
+\else
+	\ifrishabhsec
+		\declaretheorem[name=Theorem,numberwithin=section]{theorem}
+	\else
+		\declaretheorem[name=Theorem]{theorem}
+	\fi
+	
+    \declaretheorem[name=Lemma,sibling=theorem]{lemma}
+    \declaretheorem[name=Proposition,sibling=theorem]{proposition}
+    \declaretheorem[name=Corollary,sibling=theorem]{corollary}
+    \declaretheorem[name=Assumption,sibling=theorem]{assume}
+    \declaretheorem[name=Theorem,numbered=no]{theorem*}
+    \declaretheorem[name=Lemma,numbered=no]{lemma*}
+    \declaretheorem[name=Proposition,numbered=no]{proposition*}
+    \declaretheorem[name=Corollary,numbered=no]{corollary*}
+    \declaretheorem[name=Assumption,numbered=no]{assume*}
+    
+    \declaretheorem[name=Algorithm,sibling=theorem]{algorithm}
+    \declaretheorem[name=Algorithm,numbered=no]{algorithm*}
+    \declaretheorem[name=Claim,sibling=theorem]{claim}
+    \declaretheorem[name=Claim,numbered=no]{claim*}
+    
+    \declaretheorem[name=Example,sibling=theorem]{example}
+    \declaretheorem[name=Example,numbered=no]{example*}
+\fi
+
+% Remaining Environments
+\newenvironment{solution}{\noindent\textbf{\color{green!40!black}Solution.}}{}
+\newenvironment{answer}{\noindent\textbf{\color{green!40!black}Answer.}}{}
+
+\ifrishabhframe
+      \declaretheoremstyle[
+        headfont=\color{blue!40!black}\normalfont\bfseries,
+        spaceabove=8pt,
+        spacebelow=8pt,
+        bodyfont=\normalfont
+      ]{basehead}
+\else
+      \declaretheoremstyle[spaceabove=12pt,spacebelow=6pt, bodyfont=\normalfont\itshape]{basehead}
+      \declaretheorem[style=basehead,name=Problem]{problem}
+      \declaretheorem[style=basehead,name=Problem,numbered=no]{problem*}
+\fi
+
+\declaretheorem[style=basehead,name=Conjecture,sibling=theorem]{conjecture}
+\declaretheorem[style=basehead,name=Conjecture,numbered=no]{conjecture*}
+\declaretheorem[style=basehead,name=Definition,sibling=theorem]{definition}
+\declaretheorem[style=basehead,name=Definition,numbered=no]{definition*}
+\declaretheorem[style=basehead,name=Exercise,sibling=theorem]{exercise}
+\declaretheorem[style=basehead,name=Exercise,numbered=no]{exercise*}
+\declaretheorem[style=basehead,name=Fact,sibling=theorem]{fact}
+\declaretheorem[style=basehead,name=Fact,numbered=no]{fact*}
+\declaretheorem[style=basehead,name=Question,sibling=theorem]{question}
+\declaretheorem[style=basehead,name=Question,numbered=no]{question*}
+
+\declaretheorem[style=thmblackbox,name=Remark,sibling=theorem]{remark}
+\declaretheorem[style=thmblackbox,name=Remark,numbered=no]{remark*}
+
+\newenvironment{subproof}[1][Proof]{%
+\begin{proof}[#1] \renewcommand{\qedsymbol}{$\blacksquare$}}%
+{\end{proof}}
+
+% Matrices
+\RequirePackage{physics}
+\RequirePackage{pstricks}
+\newenvironment{sysmatrix}[1]
+	 {\left[\begin{array}{@{}#1@{}}}
+	 {\end{array}\right]}
+
+\newenvironment{rowops}
+	{\!\begin{aligned}}
+	{\end{aligned}}
+\newcommand{\ro}[1]{%
+	\xrightarrow{\mathmakebox[\rowidth]{#1}}%
+}
+
+\newlength{\rowidth} % row operation width
+\AtBeginDocument{\setlength{\rowidth}{3em}}
+
+\newcommand{\psnode}[1]{\pscirclebox{#1}}
+
+\newcommand{\vect}[1]{%
+\begin{bmatrix} #1\checknextarg}
+\newcommand{\checknextarg}{\@ifnextchar\bgroup{\gobblenextarg}{ \end{bmatrix}}}
+\newcommand{\gobblenextarg}[1]{ \\ #1\@ifnextchar\bgroup{\gobblenextarg}{ \end{bmatrix}}}
+
+\newenvironment{vspan}
+	{\text{span} \left\{}
+	{\right\}}
+
+% Complex Numbers
+\newcommand{\CCcoll}[3]{
+\begin{sysmatrix}
+1 & #1 & \ol{#1} \\
+1 & #2 & \ol{#2} \\
+1 & #3 & \ol{#3} 
+\end{sysmatrix}
+}
+
+% Probability Comands
+% - \PP(A^c), like autsolving and shit
+% - pie for arbitrary size
+
+% Graphs
+\RequirePackage{pgfplots}
